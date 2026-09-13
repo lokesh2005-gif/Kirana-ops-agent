@@ -109,48 +109,83 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     use_webhook = os.environ.get("USE_WEBHOOK", "false").lower() == "true"
+    port = int(os.environ.get("PORT", "8443"))
+
     if use_webhook:
-        port = int(os.environ.get("PORT", "8443"))
-        webhook_url = os.environ.get("WEBHOOK_URL", "").strip()
+        webhook_url = os.environ.get("WEBHOOK_URL", "").strip().strip("\"'<> ")
+        render_url = os.environ.get("RENDER_EXTERNAL_URL", "").strip().strip("\"'<> ")
 
-        # Fallback to Render's automatically provided external URL if WEBHOOK_URL is not set
-        if not webhook_url:
-            render_url = os.environ.get("RENDER_EXTERNAL_URL", "").strip()
-            if render_url:
-                webhook_url = f"{render_url.rstrip('/')}/webhook"
+        # If webhook_url is empty or contains placeholder text, fallback to RENDER_EXTERNAL_URL
+        placeholders = ["<", ">", "your-app", "your-service", "example.com"]
+        is_placeholder = any(p in webhook_url.lower() for p in placeholders)
 
-        if not webhook_url:
-            raise ValueError(
-                "USE_WEBHOOK is true but neither WEBHOOK_URL nor RENDER_EXTERNAL_URL is configured. "
-                "Please set WEBHOOK_URL (e.g. https://your-service.onrender.com/webhook) in environment variables."
-            )
+        if (not webhook_url or is_placeholder) and render_url:
+            logger.info(f"Using RENDER_EXTERNAL_URL fallback: {render_url}")
+            webhook_url = f"{render_url.rstrip('/')}/webhook"
 
+        if not webhook_url or any(p in webhook_url.lower() for p in placeholders):
+            logger.warning("No valid webhook URL found. Falling back to Polling mode with HTTP health server for Render.")
+            use_webhook = False
+
+    if use_webhook:
         # Ensure HTTPS protocol
         if webhook_url.startswith("http://"):
             webhook_url = "https://" + webhook_url[len("http://"):]
         elif not webhook_url.startswith("https://"):
             webhook_url = f"https://{webhook_url}"
 
-        # Ensure path ends with an endpoint
-        from urllib.parse import urlparse
+        # Parse and sanitize URL
+        from urllib.parse import urlparse, urlunparse
         parsed = urlparse(webhook_url)
         path = parsed.path.strip("/")
         secret_path = path if path else "webhook"
 
-        # Ensure full webhook_url matches url_path
-        if not path:
-            webhook_url = f"{webhook_url.rstrip('/')}/{secret_path}"
+        # Remove non-standard ports from public URL (Telegram only supports 443, 80, 88, 8443)
+        # Render terminates TLS on port 443 externally and routes to internal PORT
+        netloc = parsed.netloc.split(":")[0]
+        sanitized_url = urlunparse(("https", netloc, f"/{secret_path}", "", "", ""))
 
-        logger.info(f"Starting webhook on port {port}, url_path=/{secret_path}, full_url={webhook_url}")
-        app.run_webhook(
-            listen="0.0.0.0",
-            port=port,
-            url_path=secret_path,
-            webhook_url=webhook_url,
-        )
-    else:
-        logger.info("Starting polling mode for local dev...")
-        app.run_polling()
+        logger.info(f"Starting webhook on internal port {port}, url_path=/{secret_path}, public_url={sanitized_url}")
+        try:
+            app.run_webhook(
+                listen="0.0.0.0",
+                port=port,
+                url_path=secret_path,
+                webhook_url=sanitized_url,
+            )
+            return
+        except Exception as e:
+            logger.error(f"Webhook startup failed ({e}). Falling back to Polling mode.")
+            use_webhook = False
+
+    # Polling mode with lightweight HTTP health check server for Render / cloud platforms
+    import threading
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+
+    class HealthCheckHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write(b'{"status":"ok","service":"kirana-ops-agent"}')
+
+        def do_HEAD(self):
+            self.send_response(200)
+            self.end_headers()
+
+        def log_message(self, format, *args):
+            pass  # suppress noisy health check logs
+
+    try:
+        health_server = HTTPServer(("0.0.0.0", port), HealthCheckHandler)
+        t = threading.Thread(target=health_server.serve_forever, daemon=True)
+        t.start()
+        logger.info(f"HTTP health server started on port {port} (satisfies Render web service check)")
+    except Exception as e:
+        logger.warning(f"Could not bind health server on port {port}: {e}")
+
+    logger.info("Starting Telegram bot in Polling mode...")
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
