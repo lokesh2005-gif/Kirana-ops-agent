@@ -51,6 +51,19 @@ def get_stock(product_id: int) -> str:
     finally:
         db.close()
 
+def list_all_products(category: Optional[str] = None) -> str:
+    """Lists all products in the store inventory with their ID, name, category, stock quantity, and selling price. Use when the user asks to see all items or products in inventory."""
+    db = SessionLocal()
+    try:
+        results = inventory.list_all_products(db, category=category)
+        if not results:
+            return "No products found in inventory."
+        return json.dumps([{"id": p.id, "name": p.name, "category": p.category, "quantity": p.quantity, "unit": p.unit, "sell_price": p.sell_price, "cost_price": p.cost_price} for p in results])
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        db.close()
+
 def create_bill_draft(customer_id: Optional[int] = None) -> str:
     """Creates a new draft bill. Call this first when starting a new billing flow."""
     db = SessionLocal()
@@ -257,7 +270,7 @@ def get_gst_collected(start_date: str, end_date: str) -> str:
 
 # List of all tools for the agent
 ALL_TOOLS = [
-    search_product, add_product, receive_stock, get_stock, get_low_stock,
+    search_product, add_product, receive_stock, get_stock, get_low_stock, list_all_products,
     create_bill_draft, add_bill_item, update_bill_item, remove_bill_item,
     get_bill_draft, finalize_bill,
     create_customer, add_credit, record_payment, get_customer_balance,

@@ -94,16 +94,35 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 else:
                     raise e
         
-        # Document handling — agent tools prefix file paths with PDF_FILE: or PPTX_FILE:
+        # Document handling — deliver generated invoices (PDF) and reports (PPTX) directly to chat
         import re as _re
-        file_matches = _re.findall(r'(?:PDF_FILE|PPTX_FILE):([\w/\\.:\-\s]+\.(?:pdf|pptx))', response_text)
+        import glob
         
-        for fp in file_matches:
+        explicit_matches = _re.findall(r'(?:PDF_FILE|PPTX_FILE):([^\s\n`]+\.(?:pdf|pptx))', response_text)
+        path_matches = _re.findall(r'`?(artifacts/(?:reports|invoices)/[^\s\n`]+\.(?:pdf|pptx))`?', response_text)
+        all_candidates = list(dict.fromkeys(explicit_matches + path_matches))
+        
+        # Fallback: if user asked for a pptx/invoice/bill and no files were matched in response text, send the most recently generated file
+        user_lower = user_text.lower()
+        if not all_candidates:
+            if any(w in user_lower for w in ["pptx", "presentation", "slide"]):
+                recent_pptx = sorted(glob.glob("artifacts/reports/*.pptx"), key=os.path.getmtime, reverse=True)
+                if recent_pptx:
+                    all_candidates.append(recent_pptx[0])
+            if any(w in user_lower for w in ["invoice", "pdf", "bill"]):
+                recent_pdf = sorted(glob.glob("artifacts/invoices/*.pdf"), key=os.path.getmtime, reverse=True)
+                if recent_pdf:
+                    all_candidates.append(recent_pdf[0])
+
+        for fp in all_candidates:
             fp = fp.strip()
             if os.path.exists(fp):
-                with open(fp, 'rb') as doc:
-                    await update.message.reply_document(document=doc)
-            # Strip the raw file path marker from visible response text
+                try:
+                    with open(fp, 'rb') as doc:
+                        await update.message.reply_document(document=doc, filename=os.path.basename(fp))
+                except Exception as doc_err:
+                    logger.error(f"Failed to send document {fp}: {doc_err}")
+            # Strip explicit raw file markers from text
             response_text = response_text.replace(f"PDF_FILE:{fp}", "").replace(f"PPTX_FILE:{fp}", "").strip()
         
         if response_text:

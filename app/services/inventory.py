@@ -56,3 +56,9 @@ def get_stock(db: Session, product_id: int) -> float:
 
 def get_low_stock(db: Session) -> List[Product]:
     return db.query(Product).filter(Product.quantity <= Product.reorder_level).all()
+
+def list_all_products(db: Session, category: Optional[str] = None, limit: int = 50) -> List[Product]:
+    query = db.query(Product)
+    if category:
+        query = query.filter(Product.category.ilike(f"%{category}%"))
+    return query.order_by(Product.name).limit(limit).all()
