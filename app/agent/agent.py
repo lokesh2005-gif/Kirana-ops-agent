@@ -17,6 +17,9 @@ def _load_keys() -> list[str]:
     keys = [k.strip() for k in re.split(r"[,;\n]", raw) if k.strip()]
     return keys
 
+def _get_http_options() -> types.HttpOptions:
+    return types.HttpOptions(retry_options=types.HttpRetryOptions(attempts=1))
+
 def get_current_client() -> genai.Client:
     global _client, _api_keys, _current_key_idx
     if not _api_keys:
@@ -24,9 +27,9 @@ def get_current_client() -> genai.Client:
         if not _api_keys:
             raise ValueError("GEMINI_API_KEY is missing in environment.")
         _current_key_idx = 0
-        _client = genai.Client(api_key=_api_keys[_current_key_idx])
+        _client = genai.Client(api_key=_api_keys[_current_key_idx], http_options=_get_http_options())
     elif _client is None:
-        _client = genai.Client(api_key=_api_keys[_current_key_idx])
+        _client = genai.Client(api_key=_api_keys[_current_key_idx], http_options=_get_http_options())
     return _client
 
 def rotate_api_key() -> bool:
@@ -44,7 +47,7 @@ def rotate_api_key() -> bool:
     _current_key_idx = (_current_key_idx + 1) % len(_api_keys)
     masked_key = _api_keys[_current_key_idx][:6] + "..." + _api_keys[_current_key_idx][-4:]
     logger.info(f"Rotated to Gemini API key index {_current_key_idx + 1}/{len(_api_keys)} ({masked_key})")
-    _client = genai.Client(api_key=_api_keys[_current_key_idx])
+    _client = genai.Client(api_key=_api_keys[_current_key_idx], http_options=_get_http_options())
     return True
 
 def get_chat_session(history=None):
@@ -55,10 +58,11 @@ def get_chat_session(history=None):
         system_instruction=SYSTEM_PROMPT,
         temperature=0.0,
     )
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash")
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
     chat = client.chats.create(
         model=model_name,
         config=config,
         history=history,
     )
     return chat
+
