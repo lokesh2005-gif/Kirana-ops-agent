@@ -1,0 +1,51 @@
+sku,name,category,unit,is_loose,cost_price,sell_price,mrp,quantity,reorder_level,gst_rate,hsn_code
+LOOSE-SUGAR,Sugar (Loose),Staples,kg,true,35.0,42.0,45.0,50.0,10.0,0.0,1701
+LOOSE-RICE,Rice (Loose),Staples,kg,true,40.0,55.0,60.0,100.0,20.0,0.0,1006
+LOOSE-DAL,Toor Dal (Loose),Staples,kg,true,90.0,110.0,120.0,30.0,5.0,0.0,0713
+LOOSE-MOONG,Moong Dal (Loose),Staples,kg,true,85.0,105.0,115.0,40.0,8.0,0.0,0713
+LOOSE-CHANA,Chana Dal (Loose),Staples,kg,true,65.0,80.0,90.0,35.0,5.0,0.0,0713
+LOOSE-URAD,Urad Dal (Loose),Staples,kg,true,95.0,120.0,130.0,25.0,5.0,0.0,0713
+LOOSE-RAVVA,Sooji Ravva (Loose),Staples,kg,true,30.0,40.0,45.0,40.0,10.0,0.0,1103
+LOOSE-MAIDA,Maida Flour (Loose),Staples,kg,true,28.0,38.0,42.0,45.0,10.0,0.0,1101
+ATTA-AASH-5KG,Aashirvaad Atta 5kg,Packaged,packet,false,180.0,210.0,230.0,20.0,5.0,5.0,1101
+ATTA-AASH-10KG,Aashirvaad Atta 10kg,Packaged,packet,false,350.0,410.0,440.0,15.0,3.0,5.0,1101
+ATTA-FORT-5KG,Fortune Chakki Atta 5kg,Packaged,packet,false,175.0,200.0,220.0,18.0,4.0,5.0,1101
+SALT-TATA-1KG,Tata Salt 1kg,Packaged,packet,false,15.0,24.0,25.0,50.0,10.0,5.0,2501
+SALT-TATA-LITE,Tata Salt Lite 1kg,Packaged,packet,false,30.0,42.0,45.0,25.0,5.0,5.0,2501
+OIL-FORT-1L,Fortune Sunflower Oil 1L,Packaged,litre,false,110.0,140.0,150.0,40.0,10.0,5.0,1512
+OIL-DHARA-1L,Dhara Mustard Oil 1L,Packaged,litre,false,125.0,155.0,165.0,30.0,8.0,5.0,1514
+OIL-SAFFOLA-1L,Saffola Gold Oil 1L,Packaged,litre,false,145.0,180.0,195.0,25.0,5.0,5.0,1512
+GHEE-AMUL-500M,Amul Pure Ghee 500ml,Dairy,packet,false,260.0,315.0,330.0,20.0,5.0,12.0,0405
+GHEE-GOWARD-1L,Gowardhan Ghee 1L,Dairy,packet,false,520.0,630.0,660.0,12.0,3.0,12.0,0405
+MILK-AMUL-1L,Amul Taaza Milk 1L,Dairy,packet,false,62.0,72.0,74.0,30.0,8.0,0.0,0401
+AMUL-BTR-100G,Amul Butter 100g,Dairy,packet,false,45.0,54.0,56.0,30.0,10.0,12.0,0405
+AMUL-BTR-500G,Amul Butter 500g,Dairy,packet,false,220.0,270.0,280.0,15.0,4.0,12.0,0405
+AMUL-CHEESE-200,Amul Cheese Slices 200g,Dairy,packet,false,115.0,140.0,145.0,18.0,5.0,12.0,0406
+PANNEER-AMUL-200,Amul Fresh Paneer 200g,Dairy,packet,false,75.0,95.0,100.0,25.0,6.0,0.0,0406
+MAGGI-70G,Maggi 2-Min Noodles 70g,FMCG,packet,false,12.0,14.0,14.0,100.0,20.0,18.0,1902
+MAGGI-FAMILY-4,Maggi Family Pack 280g,FMCG,packet,false,48.0,56.0,58.0,40.0,10.0,18.0,1902
+YUPPEE-NOODLES,Sunfeast Yippee Noodles 280g,FMCG,packet,false,42.0,52.0,55.0,35.0,8.0,18.0,1902
+PARLE-G,Parle-G Gold Biscuits 100g,FMCG,packet,false,4.0,5.0,5.0,200.0,50.0,18.0,1905
+BRIT-MARIE-250,Britannia Marie Gold 250g,FMCG,packet,false,28.0,35.0,38.0,50.0,15.0,18.0,1905
+BRIT-GOODDAY-100,Britannia Good Day Butter 100g,FMCG,packet,false,18.0,25.0,25.0,60.0,15.0,18.0,1905
+BRIT-BOURBON-150,Britannia Bourbon 150g,FMCG,packet,false,24.0,30.0,30.0,45.0,10.0,18.0,1905
+OREO-CHOCO-120,Cadbury Oreo Chocolate 120g,FMCG,packet,false,25.0,35.0,35.0,40.0,10.0,18.0,1905
+DAIRY-MILK-50G,Cadbury Dairy Milk 50g,FMCG,packet,false,34.0,45.0,45.0,80.0,20.0,18.0,1806
+KITKAT-38G,Nestle KitKat 38g,FMCG,packet,false,21.0,27.0,30.0,70.0,15.0,18.0,1806
+TEA-RED-500G,Brooke Bond Red Label Tea 500g,Beverages,packet,false,190.0,240.0,260.0,25.0,5.0,5.0,0902
+TEA-TAZ-250G,Tata Tea Premium 250g,Beverages,packet,false,105.0,135.0,145.0,30.0,8.0,5.0,0902
+COFFEE-NES-50G,Nescafe Classic Coffee 50g,Beverages,packet,false,130.0,165.0,175.0,25.0,5.0,18.0,2101
+COFFEE-BRU-100G,BRU Instant Coffee 100g,Beverages,packet,false,160.0,205.0,220.0,20.0,5.0,18.0,2101
+BOOST-500G,Boost Health Drink 500g,Beverages,packet,false,185.0,235.0,250.0,15.0,4.0,18.0,1901
+HORLICKS-500G,Horlicks Classic Malt 500g,Beverages,packet,false,195.0,245.0,260.0,15.0,4.0,18.0,1901
+COKE-750ML,Coca-Cola 750ml,Beverages,piece,false,32.0,40.0,40.0,50.0,12.0,18.0,2202
+SPRITE-750ML,Sprite 750ml,Beverages,piece,false,32.0,40.0,40.0,50.0,12.0,18.0,2202
+SURF-EXCEL-1KG,Surf Excel Easy Wash 1kg,Household,packet,false,115.0,145.0,155.0,30.0,8.0,18.0,3402
+ARIEL-MAT-1KG,Ariel Matic Front Load 1kg,Household,packet,false,210.0,265.0,280.0,20.0,5.0,18.0,3402
+VIM-BAR-200G,Vim Dishwash Bar 200g,Household,packet,false,12.0,16.0,16.0,100.0,25.0,18.0,3402
+VIM-GEL-250ML,Vim Dishwash Gel 250ml,Household,piece,false,42.0,55.0,60.0,40.0,10.0,18.0,3402
+DOVE-SOAP-75G,Dove Cream Beauty Bathing Soap 75g,Personal Care,packet,false,40.0,52.0,55.0,60.0,15.0,18.0,3401
+LUX-SOAP-100G,Lux International Soap 100g,Personal Care,packet,false,28.0,36.0,40.0,50.0,12.0,18.0,3401
+CLINIC-PLUS-175,Clinic Plus Health Shampoo 175ml,Personal Care,piece,false,85.0,110.0,120.0,30.0,8.0,18.0,3305
+COLGATE-MAX-150,Colgate MaxFresh Paste 150g,Personal Care,packet,false,75.0,98.0,105.0,40.0,10.0,18.0,3306
+Dettol-HAND-200,Dettol Liquid Handwash Refill 200ml,Personal Care,packet,false,45.0,58.0,62.0,35.0,8.0,18.0,3401
