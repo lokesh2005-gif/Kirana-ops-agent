@@ -12,7 +12,7 @@ load_dotenv()
 if "DATABASE_URL" not in os.environ:
     os.environ["DATABASE_URL"] = "sqlite:///kirana.db"
 
-from app.agent.agent import get_chat_session
+from app.agent.agent import get_chat_session, rotate_api_key
 from app.db.database import engine
 from app.db.models import Base
 from app.db.seed import seed_db
@@ -56,8 +56,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await context.bot.send_chat_action(chat_id=chat_id, action='typing')
         
-        # Gemini interaction with retry logic for free tier rate limits
-        max_retries = 3
+        # Gemini interaction with retry and key-rotation logic for free tier rate limits
+        raw_keys = os.environ.get("GEMINI_API_KEY", "")
+        num_keys = max(1, len([k for k in raw_keys.split(",") if k.strip()]))
+        max_retries = max(3, num_keys * 2)
         response_text = ""
         loop = asyncio.get_event_loop()
         
@@ -67,9 +69,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 response_text = response.text
                 break
             except Exception as e:
-                if "429" in str(e) and attempt < max_retries - 1:
-                    logger.warning("Rate limit hit, waiting before retry...")
-                    await asyncio.sleep(25)
+                err_str = str(e).lower()
+                is_quota_or_rate = "429" in err_str or "resource_exhausted" in err_str or "quota" in err_str
+                
+                if is_quota_or_rate:
+                    # Capture existing conversation history before rotating
+                    history = None
+                    try:
+                        history = chat.get_history()
+                    except Exception:
+                        pass
+                    
+                    rotated = rotate_api_key()
+                    if rotated:
+                        logger.warning(f"Quota/rate limit hit (attempt {attempt+1}). Rotated to next Gemini API key.")
+                        chat = get_chat_session(history=history)
+                        chat_sessions[chat_id] = chat
+                        continue  # Immediately retry with the rotated key
+                    elif attempt < max_retries - 1:
+                        logger.warning("Rate limit hit with single key, waiting 20s before retry...")
+                        await asyncio.sleep(20)
+                    else:
+                        raise e
                 else:
                     raise e
         
