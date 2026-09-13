@@ -55,8 +55,9 @@ def get_chat_session(history=None):
         system_instruction=SYSTEM_PROMPT,
         temperature=0.0,
     )
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash")
     chat = client.chats.create(
-        model="gemini-2.5-flash",
+        model=model_name,
         config=config,
         history=history,
     )
