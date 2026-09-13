@@ -9,9 +9,18 @@ An agent-first Telegram bot that runs an Indian kirana store end-to-end — bill
 | 🤖 **Telegram Bot** | [@Ops_agent_supermarket_bot](https://t.me/Ops_agent_supermarket_bot) |
 | 📦 **Repository** | [https://github.com/lokesh2005-gif/Kirana-ops-agent](https://github.com/lokesh2005-gif/Kirana-ops-agent) |
 
-> **Quick start:** Open Telegram → search `@Ops_agent_supermarket_bot` → send `/start`
+### How to Access
+
+**Option 1 — Telegram App (local system)**
+If you have the Telegram app installed, click the link below to open the bot directly:
+👉 [https://t.me/Ops_agent_supermarket_bot](https://t.me/Ops_agent_supermarket_bot)
+
+**Option 2 — Telegram Web (no app required)**
+If you do not have the Telegram app installed, you can use Telegram Web in any browser. Click the link below, log in with your phone number, and start chatting:
+👉 [https://web.telegram.org/k/#@Ops_agent_supermarket_bot](https://web.telegram.org/k/#@Ops_agent_supermarket_bot)
 
 ---
+
 
 ## Why this harness?
 
