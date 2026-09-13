@@ -139,9 +139,129 @@ def get_customer_balance(customer_id: int) -> str:
     finally:
         db.close()
 
+def generate_invoice_pdf(bill_id: int) -> str:
+    """Generates a PDF GST invoice for a finalized bill and returns the file path. Use when the user asks for a bill/invoice as a PDF document."""
+    try:
+        from app.services.invoice import generate_invoice_pdf as _gen
+        path = _gen(bill_id)
+        return f"PDF_FILE:{path}"
+    except Exception as e:
+        return f"Error generating PDF: {str(e)}"
+
+def generate_sales_analysis_pptx(start_date: str, end_date: str) -> str:
+    """Generates a PPTX sales analysis deck for a date range (YYYY-MM-DD format) with charts and insights. Returns the file path."""
+    try:
+        from datetime import date
+        from app.services.presentation import generate_sales_analysis_pptx as _gen
+        sd = date.fromisoformat(start_date)
+        ed = date.fromisoformat(end_date)
+        path = _gen(sd, ed)
+        return f"PPTX_FILE:{path}"
+    except Exception as e:
+        return f"Error generating PPTX: {str(e)}"
+
+def get_bill_draft(bill_id: int) -> str:
+    """Returns all items in a draft bill for review before finalizing."""
+    db = SessionLocal()
+    try:
+        from app.db.models import Bill, BillItem, Product
+        bill = db.query(Bill).filter(Bill.id == bill_id).first()
+        if not bill:
+            return "Bill not found."
+        items = db.query(BillItem).filter(BillItem.bill_id == bill_id).all()
+        if not items:
+            return f"Bill {bill_id} is empty."
+        lines = [f"Bill #{bill.bill_number} [{bill.status}]"]
+        for it in items:
+            prod = db.query(Product).filter(Product.id == it.product_id).first()
+            lines.append(f"  - {prod.name if prod else it.product_id}: {it.quantity} x Rs.{it.unit_price} = Rs.{it.line_total} (Item ID: {it.id})")
+        lines.append(f"  Subtotal: Rs.{bill.subtotal}  CGST: Rs.{bill.cgst_total}  SGST: Rs.{bill.sgst_total}  Total: Rs.{bill.total}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        db.close()
+
+def create_customer(name: str, phone: str = None) -> str:
+    """Creates a new customer for the khata ledger."""
+    db = SessionLocal()
+    try:
+        c = khata.create_customer(db, name, phone)
+        return f"Customer created. ID: {c.id}, Name: {c.name}"
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        db.close()
+
+def add_credit(customer_id: int, amount: float, note: str = None) -> str:
+    """Adds credit (khata) to a customer's account."""
+    db = SessionLocal()
+    try:
+        txn = khata.add_credit(db, customer_id, amount, note)
+        return f"Credit of Rs.{amount} added to customer {customer_id}. Balance: {khata.get_balance(db, customer_id)}"
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        db.close()
+
+def record_payment(customer_id: int, amount: float) -> str:
+    """Records a payment against a customer's khata balance."""
+    db = SessionLocal()
+    try:
+        txn = khata.record_payment(db, customer_id, amount)
+        return f"Payment of Rs.{amount} recorded for customer {customer_id}. New balance: {khata.get_balance(db, customer_id)}"
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        db.close()
+
+def get_low_stock() -> str:
+    """Returns all products at or below their reorder level."""
+    db = SessionLocal()
+    try:
+        prods = inventory.get_low_stock(db)
+        if not prods:
+            return "All products are above reorder levels."
+        return json.dumps([{"id": p.id, "name": p.name, "quantity": p.quantity, "reorder_level": p.reorder_level} for p in prods])
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        db.close()
+
+def get_daily_sales(target_date: str) -> str:
+    """Gets the total sales summary for a given date (YYYY-MM-DD)."""
+    db = SessionLocal()
+    try:
+        from datetime import date
+        d = date.fromisoformat(target_date)
+        result = analytics.get_daily_sales(db, d)
+        return json.dumps(result, default=str)
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        db.close()
+
+def get_gst_collected(start_date: str, end_date: str) -> str:
+    """Gets GST collected between two dates (YYYY-MM-DD)."""
+    db = SessionLocal()
+    try:
+        from datetime import date
+        sd = date.fromisoformat(start_date)
+        ed = date.fromisoformat(end_date)
+        result = analytics.get_gst_collected(db, sd, ed)
+        return json.dumps(result)
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        db.close()
+
 # List of all tools for the agent
 ALL_TOOLS = [
-    search_product, add_product, receive_stock, get_stock, create_bill_draft,
-    add_bill_item, update_bill_item, remove_bill_item, finalize_bill,
-    get_preference, set_preference, get_customer_balance
+    search_product, add_product, receive_stock, get_stock, get_low_stock,
+    create_bill_draft, add_bill_item, update_bill_item, remove_bill_item,
+    get_bill_draft, finalize_bill,
+    create_customer, add_credit, record_payment, get_customer_balance,
+    get_daily_sales, get_gst_collected,
+    generate_invoice_pdf, generate_sales_analysis_pptx,
+    get_preference, set_preference,
 ]

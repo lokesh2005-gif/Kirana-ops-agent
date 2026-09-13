@@ -4,6 +4,6 @@
 - [x] Phase 2: Business logic + tests
 - [x] Phase 3: Agent + tools
 - [x] Phase 4: Telegram
-- [ ] Phase 5: Documents
+- [x] Phase 5: Documents
 - [ ] Phase 6: Hardening
 - [ ] Phase 7: README / demo / deploy

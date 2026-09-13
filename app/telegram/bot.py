@@ -73,16 +73,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 else:
                     raise e
         
-        # Document handling for PDF/PPTX from artifacts folder
-        file_paths = re.findall(r'(?:[A-Za-z]:)?(?:[\\/]?[\w\-\s.]+)*artifacts[\\/][\w\-\s]+\.(?:pdf|pptx)', response_text)
-        if not file_paths:
-            file_paths = re.findall(r'artifacts/[a-zA-Z0-9_\-\.]+\.(?:pdf|pptx)', response_text)
-
-        for fp in file_paths:
+        # Document handling — agent tools prefix file paths with PDF_FILE: or PPTX_FILE:
+        import re as _re
+        file_matches = _re.findall(r'(?:PDF_FILE|PPTX_FILE):([\w/\\.:\-\s]+\.(?:pdf|pptx))', response_text)
+        
+        for fp in file_matches:
             fp = fp.strip()
             if os.path.exists(fp):
                 with open(fp, 'rb') as doc:
                     await update.message.reply_document(document=doc)
+            # Strip the raw file path marker from visible response text
+            response_text = response_text.replace(f"PDF_FILE:{fp}", "").replace(f"PPTX_FILE:{fp}", "").strip()
         
         if response_text:
             await update.message.reply_text(response_text)
