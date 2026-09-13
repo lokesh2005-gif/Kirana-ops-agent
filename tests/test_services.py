@@ -80,6 +80,7 @@ def test_idempotent_finalize(db_session):
     assert get_stock(db_session, p.id) == 4.0 # Stock decrements only once
 
 def test_khata_operations(db_session):
+    from app.services.khata import get_khata_summary
     c = create_customer(db_session, "Ram")
     
     # Reject payment when no balance
@@ -94,7 +95,35 @@ def test_khata_operations(db_session):
         record_payment(db_session, c.id, 600.0)
         
     record_payment(db_session, c.id, 200.0)
+    # Correct balance: 500 - 200 = 300
     assert get_balance(db_session, c.id) == 300.0
+    
+    summary = get_khata_summary(db_session, c.id)
+    assert summary["total_credit"] == 500.0
+    assert summary["total_payment"] == 200.0
+    assert summary["outstanding_balance"] == 300.0
+
+def test_daily_sales_direct_profit_calculation(db_session):
+    from datetime import date
+    from app.services.analytics import get_daily_sales
+    
+    # Add product: cost=100.0, sell_price=150.0 (excl GST)
+    p = add_product(db_session, "PROFIT-SKU", "Test Product", "cat", "kg", False, 100.0, 150.0, 5.0)
+    receive_stock(db_session, p.id, 10.0)
+    
+    bill = create_draft(db_session)
+    add_item(db_session, bill.id, p.id, 2.0) # 2 * 150 = 300 taxable revenue, 2 * 100 = 200 cost
+    b = finalize(db_session, bill.id, "cash")
+    
+    today = b.finalized_at.date()
+    stats = get_daily_sales(db_session, today)
+    
+    # Direct Profit = Net Revenue (300.0) - Total Cost (200.0) = 100.0
+    assert stats["subtotal_excl_gst"] == 300.0
+    assert stats["total_cost"] == 200.0
+    assert stats["direct_profit"] == 100.0
+    assert stats["profit_margin_percent"] == round((100.0 / 300.0) * 100, 2)
+
 
 def test_concurrency_oversell():
     # Setup fresh DB specifically for concurrency

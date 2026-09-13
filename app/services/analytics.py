@@ -5,36 +5,70 @@ from typing import List, Dict, Any
 from app.db.models import Bill, BillItem, Product
 
 def get_daily_sales(db: Session, target_date: date) -> Dict[str, Any]:
-    # Query finalized bills for a specific date
-    result = db.query(
-        func.count(Bill.id).label("bill_count"),
-        func.sum(Bill.total).label("total_sales")
-    ).filter(
-        Bill.status == 'finalized',
-        cast(Bill.finalized_at, Date) == target_date
-    ).first()
-    
+    all_bills = db.query(Bill).filter(Bill.status == 'finalized').all()
+    bills = [b for b in all_bills if b.finalized_at and b.finalized_at.date() == target_date]
+
+    bill_count = len(bills)
+    total_sales = sum(b.total for b in bills)
+    subtotal = sum(b.subtotal for b in bills)
+    cgst_total = sum(b.cgst_total for b in bills)
+    sgst_total = sum(b.sgst_total for b in bills)
+
+    total_cost = 0.0
+    for bill in bills:
+        for item in bill.items:
+            cost = item.product.cost_price if item.product else 0.0
+            total_cost += item.quantity * cost
+
+    direct_profit = subtotal - total_cost
+    profit_margin = (direct_profit / subtotal * 100.0) if subtotal > 0 else 0.0
+
     return {
         "date": target_date,
-        "bill_count": result.bill_count or 0,
-        "total_sales": float(result.total_sales or 0.0)
+        "bill_count": bill_count,
+        "total_sales": float(round(total_sales, 2)),
+        "subtotal_excl_gst": float(round(subtotal, 2)),
+        "total_cost": float(round(total_cost, 2)),
+        "direct_profit": float(round(direct_profit, 2)),
+        "profit_margin_percent": float(round(profit_margin, 2)),
+        "total_gst": float(round(cgst_total + sgst_total, 2)),
+        "cgst": float(round(cgst_total, 2)),
+        "sgst": float(round(sgst_total, 2)),
+        "formula": f"Net Revenue (₹{subtotal:.2f}) - Total Cost (₹{total_cost:.2f}) = Direct Profit (₹{direct_profit:.2f})"
     }
 
 def get_sales_summary(db: Session, start_date: date, end_date: date) -> Dict[str, Any]:
-    result = db.query(
-        func.count(Bill.id).label("bill_count"),
-        func.sum(Bill.total).label("total_sales")
-    ).filter(
-        Bill.status == 'finalized',
-        cast(Bill.finalized_at, Date) >= start_date,
-        cast(Bill.finalized_at, Date) <= end_date
-    ).first()
-    
+    all_bills = db.query(Bill).filter(Bill.status == 'finalized').all()
+    bills = [b for b in all_bills if b.finalized_at and start_date <= b.finalized_at.date() <= end_date]
+
+    bill_count = len(bills)
+    total_sales = sum(b.total for b in bills)
+    subtotal = sum(b.subtotal for b in bills)
+    cgst_total = sum(b.cgst_total for b in bills)
+    sgst_total = sum(b.sgst_total for b in bills)
+
+    total_cost = 0.0
+    for bill in bills:
+        for item in bill.items:
+            cost = item.product.cost_price if item.product else 0.0
+            total_cost += item.quantity * cost
+
+    direct_profit = subtotal - total_cost
+    profit_margin = (direct_profit / subtotal * 100.0) if subtotal > 0 else 0.0
+
     return {
         "start_date": start_date,
         "end_date": end_date,
-        "bill_count": result.bill_count or 0,
-        "total_sales": float(result.total_sales or 0.0)
+        "bill_count": bill_count,
+        "total_sales": float(round(total_sales, 2)),
+        "subtotal_excl_gst": float(round(subtotal, 2)),
+        "total_cost": float(round(total_cost, 2)),
+        "direct_profit": float(round(direct_profit, 2)),
+        "profit_margin_percent": float(round(profit_margin, 2)),
+        "total_gst": float(round(cgst_total + sgst_total, 2)),
+        "cgst": float(round(cgst_total, 2)),
+        "sgst": float(round(sgst_total, 2)),
+        "formula": f"Net Revenue (₹{subtotal:.2f}) - Total Cost (₹{total_cost:.2f}) = Direct Profit (₹{direct_profit:.2f})"
     }
 
 def get_top_products(db: Session, start_date: date, end_date: date, n: int = 5) -> List[Dict[str, Any]]:

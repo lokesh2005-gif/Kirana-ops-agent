@@ -142,11 +142,11 @@ def set_preference(key: str, value: str) -> str:
         db.close()
 
 def get_customer_balance(customer_id: int) -> str:
-    """Gets the khata (credit) balance for a customer."""
+    """Gets the khata (credit) balance and transaction summary for a customer."""
     db = SessionLocal()
     try:
-        balance = khata.get_balance(db, customer_id)
-        return f"Current balance for customer {customer_id}: {balance}"
+        summary = khata.get_khata_summary(db, customer_id)
+        return json.dumps(summary)
     except Exception as e:
         return f"Error: {str(e)}"
     finally:
@@ -206,12 +206,27 @@ def create_customer(name: str, phone: str = None) -> str:
     finally:
         db.close()
 
+def search_customer(name_or_phone: str) -> str:
+    """Searches for a customer by name or phone to find their customer_id and current khata balance."""
+    db = SessionLocal()
+    try:
+        customers = khata.search_customer(db, name_or_phone)
+        if not customers:
+            return "No customer found matching that name or phone."
+        results = [khata.get_khata_summary(db, c.id) for c in customers]
+        return json.dumps(results)
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        db.close()
+
 def add_credit(customer_id: int, amount: float, note: str = None) -> str:
     """Adds credit (khata) to a customer's account."""
     db = SessionLocal()
     try:
-        txn = khata.add_credit(db, customer_id, amount, note)
-        return f"Credit of Rs.{amount} added to customer {customer_id}. Balance: {khata.get_balance(db, customer_id)}"
+        khata.add_credit(db, customer_id, amount, note)
+        summary = khata.get_khata_summary(db, customer_id)
+        return json.dumps(summary)
     except Exception as e:
         return f"Error: {str(e)}"
     finally:
@@ -221,8 +236,9 @@ def record_payment(customer_id: int, amount: float) -> str:
     """Records a payment against a customer's khata balance."""
     db = SessionLocal()
     try:
-        txn = khata.record_payment(db, customer_id, amount)
-        return f"Payment of Rs.{amount} recorded for customer {customer_id}. New balance: {khata.get_balance(db, customer_id)}"
+        khata.record_payment(db, customer_id, amount)
+        summary = khata.get_khata_summary(db, customer_id)
+        return json.dumps(summary)
     except Exception as e:
         return f"Error: {str(e)}"
     finally:
@@ -273,7 +289,7 @@ ALL_TOOLS = [
     search_product, add_product, receive_stock, get_stock, get_low_stock, list_all_products,
     create_bill_draft, add_bill_item, update_bill_item, remove_bill_item,
     get_bill_draft, finalize_bill,
-    create_customer, add_credit, record_payment, get_customer_balance,
+    create_customer, search_customer, add_credit, record_payment, get_customer_balance,
     get_daily_sales, get_gst_collected,
     generate_invoice_pdf, generate_sales_analysis_pptx,
     get_preference, set_preference,

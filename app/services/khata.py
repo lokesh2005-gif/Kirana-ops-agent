@@ -10,8 +10,15 @@ def create_customer(db: Session, name: str, phone: Optional[str] = None) -> Cust
     db.refresh(c)
     return c
 
-def get_balance(db: Session, customer_id: int) -> float:
-    # credit adds to balance, payment subtracts from it.
+def search_customer(db: Session, query: str) -> list[Customer]:
+    search_term = f"%{query}%"
+    return db.query(Customer).filter(Customer.name.ilike(search_term)).all()
+
+def get_khata_summary(db: Session, customer_id: int) -> dict:
+    c = db.query(Customer).filter(Customer.id == customer_id).first()
+    if not c:
+        raise ValueError(f"Customer ID {customer_id} not found")
+        
     credits = db.query(func.sum(KhataTransaction.amount)).filter(
         KhataTransaction.customer_id == customer_id, 
         KhataTransaction.type == 'credit'
@@ -22,7 +29,19 @@ def get_balance(db: Session, customer_id: int) -> float:
         KhataTransaction.type == 'payment'
     ).scalar() or 0.0
     
-    return credits - payments
+    balance = credits - payments
+    return {
+        "customer_id": c.id,
+        "customer_name": c.name,
+        "phone": c.phone,
+        "total_credit": float(round(credits, 2)),
+        "total_payment": float(round(payments, 2)),
+        "outstanding_balance": float(round(balance, 2)),
+        "formula": f"Total Credit (₹{credits:.2f}) - Total Payment (₹{payments:.2f}) = Outstanding Balance (₹{balance:.2f})"
+    }
+
+def get_balance(db: Session, customer_id: int) -> float:
+    return get_khata_summary(db, customer_id)["outstanding_balance"]
 
 def add_credit(db: Session, customer_id: int, amount: float, note: Optional[str] = None) -> KhataTransaction:
     if amount <= 0:
