@@ -1,6 +1,6 @@
 # Kirana Ops Agent - Progress
 
-- [ ] Phase 1: Data layer
+- [x] Phase 1: Data layer
 - [ ] Phase 2: Business logic + tests
 - [ ] Phase 3: Agent + tools
 - [ ] Phase 4: Telegram
