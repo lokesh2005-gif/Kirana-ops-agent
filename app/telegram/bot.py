@@ -111,10 +111,37 @@ def main():
     use_webhook = os.environ.get("USE_WEBHOOK", "false").lower() == "true"
     if use_webhook:
         port = int(os.environ.get("PORT", "8443"))
-        webhook_url = os.environ.get("WEBHOOK_URL", "")
-        # Extract secret path from webhook URL for security
-        secret_path = webhook_url.split("/")[-1] if "/" in webhook_url else "webhook"
-        logger.info(f"Starting webhook on port {port}, path=/{secret_path}")
+        webhook_url = os.environ.get("WEBHOOK_URL", "").strip()
+
+        # Fallback to Render's automatically provided external URL if WEBHOOK_URL is not set
+        if not webhook_url:
+            render_url = os.environ.get("RENDER_EXTERNAL_URL", "").strip()
+            if render_url:
+                webhook_url = f"{render_url.rstrip('/')}/webhook"
+
+        if not webhook_url:
+            raise ValueError(
+                "USE_WEBHOOK is true but neither WEBHOOK_URL nor RENDER_EXTERNAL_URL is configured. "
+                "Please set WEBHOOK_URL (e.g. https://your-service.onrender.com/webhook) in environment variables."
+            )
+
+        # Ensure HTTPS protocol
+        if webhook_url.startswith("http://"):
+            webhook_url = "https://" + webhook_url[len("http://"):]
+        elif not webhook_url.startswith("https://"):
+            webhook_url = f"https://{webhook_url}"
+
+        # Ensure path ends with an endpoint
+        from urllib.parse import urlparse
+        parsed = urlparse(webhook_url)
+        path = parsed.path.strip("/")
+        secret_path = path if path else "webhook"
+
+        # Ensure full webhook_url matches url_path
+        if not path:
+            webhook_url = f"{webhook_url.rstrip('/')}/{secret_path}"
+
+        logger.info(f"Starting webhook on port {port}, url_path=/{secret_path}, full_url={webhook_url}")
         app.run_webhook(
             listen="0.0.0.0",
             port=port,
