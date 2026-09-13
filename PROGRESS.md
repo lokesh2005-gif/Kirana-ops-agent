@@ -6,7 +6,7 @@
 - [x] Phase 4: Telegram
 - [x] Phase 5: Documents
 - [x] Phase 6: Hardening
-- [ ] Phase 7: README / demo / deploy
+- [x] Phase 7: README / demo / deploy
 
 ---
 

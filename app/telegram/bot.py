@@ -112,8 +112,15 @@ def main():
     if use_webhook:
         port = int(os.environ.get("PORT", "8443"))
         webhook_url = os.environ.get("WEBHOOK_URL", "")
-        logger.info(f"Starting webhook on port {port}")
-        app.run_webhook(listen="0.0.0.0", port=port, webhook_url=webhook_url)
+        # Extract secret path from webhook URL for security
+        secret_path = webhook_url.split("/")[-1] if "/" in webhook_url else "webhook"
+        logger.info(f"Starting webhook on port {port}, path=/{secret_path}")
+        app.run_webhook(
+            listen="0.0.0.0",
+            port=port,
+            url_path=secret_path,
+            webhook_url=webhook_url,
+        )
     else:
         logger.info("Starting polling mode for local dev...")
         app.run_polling()
