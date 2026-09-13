@@ -2,7 +2,15 @@
 
 An agent-first Telegram bot that runs an Indian kirana store end-to-end — billing, stock, GST, khata credit, and document generation — entirely through natural language. No web UI. No regex/keyword router. The LLM decides which tools to call.
 
-**Telegram Bot:** `@KiranaOpsBot` _(keep running during review)_
+## 🔴 Live Demo
+
+| | Link |
+|---|---|
+| 🤖 **Telegram Bot** | [@Ops_agent_supermarket_bot](https://t.me/Ops_agent_supermarket_bot) |
+| 🌐 **Live Server** | [https://kirana-ops-agent-dfh0.onrender.com](https://kirana-ops-agent-dfh0.onrender.com) |
+| 📦 **Repository** | [https://github.com/lokesh2005-gif/Kirana-ops-agent](https://github.com/lokesh2005-gif/Kirana-ops-agent) |
+
+> **Quick start:** Open Telegram → search `@Ops_agent_supermarket_bot` → send `/start`
 
 ---
 
@@ -207,7 +215,7 @@ Send any message to the Telegram bot. You should get a real response. Check Rend
 ## Running Tests
 
 ```bash
-# All tests (29 tests, ~2s, zero external services)
+# All tests (30 tests, ~2s, zero external services)
 pytest tests/ -v
 
 # Hardening-only (22 tests covering all 9 hard requirements)
