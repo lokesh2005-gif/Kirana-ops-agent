@@ -7,7 +7,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 if "DATABASE_URL" not in os.environ:
     os.environ["DATABASE_URL"] = "sqlite:///kirana.db"
