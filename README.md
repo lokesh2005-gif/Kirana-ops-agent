@@ -7,7 +7,6 @@ An agent-first Telegram bot that runs an Indian kirana store end-to-end — bill
 | | Link |
 |---|---|
 | 🤖 **Telegram Bot** | [@Ops_agent_supermarket_bot](https://t.me/Ops_agent_supermarket_bot) |
-| 🌐 **Live Server** | [https://kirana-ops-agent-dfh0.onrender.com](https://kirana-ops-agent-dfh0.onrender.com) |
 | 📦 **Repository** | [https://github.com/lokesh2005-gif/Kirana-ops-agent](https://github.com/lokesh2005-gif/Kirana-ops-agent) |
 
 > **Quick start:** Open Telegram → search `@Ops_agent_supermarket_bot` → send `/start`
