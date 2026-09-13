@@ -1,0 +1,9 @@
+SQLAlchemy
+pydantic
+google-adk
+google-genai
+python-telegram-bot[webhooks]
+reportlab
+python-pptx
+matplotlib
+pytest
