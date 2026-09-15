@@ -2,22 +2,25 @@
 
 An agent-first Telegram bot that runs an Indian kirana store end-to-end — billing, stock, GST, khata credit, and document generation — entirely through natural language. No web UI. No regex/keyword router. The LLM decides which tools to call.
 
-## 🔴 Live Demo
+## 🔴 Live Demo & Submission Links
 
 | | Link |
 |---|---|
-| 🤖 **Telegram Bot** | [@Ops_agent_supermarket_bot](https://t.me/Ops_agent_supermarket_bot) |
-| 📦 **Repository** | [https://github.com/lokesh2005-gif/Kirana-ops-agent](https://github.com/lokesh2005-gif/Kirana-ops-agent) |
+| 🤖 **Telegram Bot Handle** | [@kirana_ops_agent_bot](https://t.me/kirana_ops_agent_bot) |
+| 📹 **Demo Video (4–5 min)** | [Watch on Google Drive](https://drive.google.com/file/d/13zzrDZS4OU2JlsraAPzcxfkCLz1yFBdw/view?usp=sharing) |
+| 📦 **GitHub Repository** | [https://github.com/lokesh2005-gif/Kirana-ops-agent](https://github.com/lokesh2005-gif/Kirana-ops-agent) *(Private — Collaborators: `Aswath363`, `akshaiP`, `ashwanthnebula`)* |
+| 📂 **Full Deliverables Folder** | [Google Drive — All Submission Docs](https://drive.google.com/drive/folders/1xDqaVU92MgW6t0KwMpIsBzOBEWmw7xOQ?usp=sharing) |
+| 👤 **LinkedIn** | [Lokesh V](https://www.linkedin.com/in/lokesh-v-131913290) |
 
-### How to Access
+### How to Access the Bot
 
 **Option 1 — Telegram App (local system)**
 If you have the Telegram app installed, click the link below to open the bot directly:
-👉 [https://t.me/Ops_agent_supermarket_bot](https://t.me/Ops_agent_supermarket_bot)
+👉 [https://t.me/kirana_ops_agent_bot](https://t.me/kirana_ops_agent_bot)
 
 **Option 2 — Telegram Web (no app required)**
 If you do not have the Telegram app installed, you can use Telegram Web in any browser. Click the link below, log in with your phone number, and start chatting:
-👉 [https://web.telegram.org/k/#@Ops_agent_supermarket_bot](https://web.telegram.org/k/#@Ops_agent_supermarket_bot)
+👉 [https://web.telegram.org/k/#@kirana_ops_agent_bot](https://web.telegram.org/k/#@kirana_ops_agent_bot)
 
 ---
 
