@@ -6,6 +6,7 @@ An agent-first Telegram bot that runs an Indian kirana store end-to-end — bill
 
 | | Link |
 |---|---|
+| 🤖 **Telegram Bot name** | @kirana_ops_agent_bot |
 | 🤖 **Telegram Bot Handle** | [@kirana_ops_agent_bot](https://t.me/kirana_ops_agent_bot) |
 | 📹 **Demo Video (4–5 min)** | [Watch on Google Drive](https://drive.google.com/file/d/13zzrDZS4OU2JlsraAPzcxfkCLz1yFBdw/view?usp=sharing) |
 | 📦 **GitHub Repository** | [https://github.com/lokesh2005-gif/Kirana-ops-agent](https://github.com/lokesh2005-gif/Kirana-ops-agent) *(Private — Collaborators: `Aswath363`, `akshaiP`, `ashwanthnebula`)* |
